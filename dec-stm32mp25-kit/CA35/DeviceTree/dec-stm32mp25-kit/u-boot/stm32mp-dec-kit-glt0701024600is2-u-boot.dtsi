@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)
+/*
+ * Copyright (C) 2025, STMicroelectronics - All Rights Reserved
+ * Author: STM32CubeMX code generation for STMicroelectronics.
+ */
+
+/* For more information on Device Tree configuration, please refer to
+ * https://wiki.st.com/stm32mpu/wiki/Category:Device_tree_configuration
+ */
+
+#include "stm32mp25-u-boot.dtsi"
+
+/* USER CODE BEGIN includes */
+/* USER CODE END includes */
+
+/ {
+
+	/* USER CODE BEGIN root */
+	fwu-mdata {
+		compatible = "u-boot,fwu-mdata-gpt";
+		fwu-mdata-store = <&sdmmc1>;
+	};	
+	/* USER CODE END root */
+
+	clocks{
+
+		/* USER CODE BEGIN clocks */
+		/* USER CODE END clocks */
+	};
+
+}; /*root*/
+
+/* USER CODE BEGIN addons */
+&dwc3 {
+	phys = <&usb2_phy2>;
+	phy-names = "usb2-phy";
+	dr_mode = "peripheral";
+	maximum-speed = "high-speed";
+};
+
+&usart2 {
+	bootph-all;
+};
+
+&usart2_pins_mx {
+	bootph-all;
+	pins1 {
+		bootph-all;
+	};
+	pins2 {
+		bootph-all;
+	};
+};
+
+&sdmmc1 {
+	bootph-all;
+};
+
+&sdmmc1_pins_mx {
+	bootph-all;
+};
+
+&sdmmc1_opendrain_pins_mx {
+	bootph-all;
+};
+
+&usd_pwron_reg {
+	bootph-all;
+};
+
+&usd_pwron_reg_pins {
+	bootph-all;
+};
+
+&gpiod {
+	bootph-all;
+};
+
+&scmi_regu {
+	bootph-all;
+};
+
+&scmi_vddio1 {
+	bootph-all;
+};
+/* USER CODE END addons */
+

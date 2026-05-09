@@ -1,0 +1,63 @@
+# Hook DEC external-DT into u-boot-stm32mp and (optionally) generate the
+# u-boot dts/Makefile so 'make dtbs' picks up DEC DTBs from the staged
+# project tree.
+inherit dec-extdt-stm32mp
+
+# Inherit externalsrc so EXTERNALSRC:pn-u-boot-stm32mp in local.conf
+# (pointing at /home/aford/src/beacon/uboot-stm32) is honored. No-op if
+# EXTERNALSRC isn't set.
+inherit externalsrc
+
+# SOC support list used by the autogen of the external_dt Makefile
+SOC_UBOOT_CONFIG_SUPPORTED = "CONFIG_STM32MP13X CONFIG_STM32MP15X CONFIG_STM32MP21X CONFIG_STM32MP23X CONFIG_STM32MP25X"
+
+# ------------------------------------------------
+# Generate Makefile for usage of EXTERNAL DT with DEC project devicetree
+# ------------------------------------------------
+autogenerate_makefile_for_external_dt_dec() {
+    [ "${ENABLE_DEC_EXTDT}" -ne 1 ] && return
+    [ "${DEC_EXTDT_ENABLE_MK}" -ne 1 ] && return
+
+    if [ -e "${STAGING_EXTDT_DIR}/${EXTDT_DIR_UBOOT}/Makefile" ]; then
+        [ "${DEC_EXTDT_FORCE_MK}" -ne 1 ] && return
+    fi
+
+    echo "# SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause)" > ${WORKDIR}/Makefile.external_dt
+    echo "" >>  ${WORKDIR}/Makefile.external_dt
+
+    dtb=$(echo "${STM32MP_DEVICETREE} ${STM32MP_DT_FILES_PROGRAMMER}" | tr ' ' '\n' | uniq | tr '\n' ' ')
+    for supported in ${SOC_UBOOT_CONFIG_SUPPORTED}; do
+        echo "dtb-\$(${supported}) += \\" >> ${WORKDIR}/Makefile.external_dt
+        for soc in ${STM32MP_SOC_NAME}; do
+            soc_maj=$(echo ${soc} | awk '{print toupper($0)}')
+            [ "$(echo ${supported} | grep -c ${soc_maj})" -ne 1 ] && continue
+            for devicetree in ${dtb}; do
+                [ "$(echo ${devicetree} | grep -c ${soc})" -eq 1 ] && echo "     ${devicetree}.dtb \\" >> ${WORKDIR}/Makefile.external_dt
+            done
+        done
+        echo "" >> ${WORKDIR}/Makefile.external_dt
+        echo "" >> ${WORKDIR}/Makefile.external_dt
+    done
+    echo "#include \$(srctree)/scripts/Makefile.dts" >> ${WORKDIR}/Makefile.external_dt
+    echo "" >> ${WORKDIR}/Makefile.external_dt
+    echo "targets += \$(dtb-y)" >> ${WORKDIR}/Makefile.external_dt
+    echo "" >> ${WORKDIR}/Makefile.external_dt
+    echo "DTC_FLAGS += -a 0x8" >> ${WORKDIR}/Makefile.external_dt
+    echo "" >> ${WORKDIR}/Makefile.external_dt
+    echo "PHONY += dtbs" >> ${WORKDIR}/Makefile.external_dt
+    echo "dtbs: \$(addprefix \$(obj)/, \$(dtb-y))" >> ${WORKDIR}/Makefile.external_dt
+    echo "	@:" >> ${WORKDIR}/Makefile.external_dt
+    echo "" >> ${WORKDIR}/Makefile.external_dt
+    echo "clean-files := *.dtb *.dtbo *_HS" >> ${WORKDIR}/Makefile.external_dt
+
+    cp -f ${WORKDIR}/Makefile.external_dt ${STAGING_EXTDT_DIR}/${EXTDT_DIR_UBOOT}/Makefile
+    if [ -e "${STAGING_EXTDT_DIR}/${EXTDT_DIR_UBOOT_SERIAL}/Makefile" ]; then
+        [ "${DEC_EXTDT_FORCE_MK}" -ne 1 ] && return
+    fi
+    cp -f ${WORKDIR}/Makefile.external_dt ${STAGING_EXTDT_DIR}/${EXTDT_DIR_UBOOT_SERIAL}/Makefile
+}
+python() {
+    machine_overrides = d.getVar('MACHINEOVERRIDES').split(':')
+    if "stm32mpcommonmx" in machine_overrides:
+        d.appendVarFlag('do_configure', 'prefuncs', ' autogenerate_makefile_for_external_dt_dec')
+}

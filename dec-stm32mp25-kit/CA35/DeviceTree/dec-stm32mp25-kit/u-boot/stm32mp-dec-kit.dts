@@ -43,6 +43,18 @@
 		serial2 = &usart1;
 		ethernet0 = &eth1;
 		ethernet1 = &eth2;
+		/*
+		 * Match the ST flashlayout convention where the
+		 * FlashLayout_sdcard_*.tsv writes to mmc0 and
+		 * FlashLayout_emmc_*.tsv writes to mmc1. Without this,
+		 * enumeration depends on probe order and the TSVs target
+		 * the wrong device.
+		 *   sdmmc1 = micro-SD on carrier (J24)  → mmc0 (TSV "sdcard")
+		 *   sdmmc2 = eMMC on SOM, non-removable → mmc1 (TSV "emmc")
+		 *   sdmmc3 = IW610 SDIO (wifi)          → mmc2
+		 */
+		mmc0 = &sdmmc1;
+		mmc1 = &sdmmc2;
 	};
 
 	chosen {

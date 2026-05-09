@@ -1,0 +1,11 @@
+# u-boot's external-DT build drops compiled DTBs and dtc/cpp scratch
+# files into the project tree we ship under dec-stm32mp25-kit/. Those
+# are build artifacts — only the .dts/.dtsi/.h/Makefile sources belong
+# in the repo.
+dec-stm32mp25-kit/**/*.dtb
+dec-stm32mp25-kit/**/.*.tmp
+dec-stm32mp25-kit/**/.*.cmd
+dec-stm32mp25-kit/**/.*.d
+dec-stm32mp25-kit/**/.*.pre.tmp
+dec-stm32mp25-kit/**/.*.dts.tmp
+dec-stm32mp25-kit/**/.*.dtc.tmp

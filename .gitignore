@@ -9,3 +9,8 @@ dec-stm32mp25-kit/**/.*.d
 dec-stm32mp25-kit/**/.*.pre.tmp
 dec-stm32mp25-kit/**/.*.dts.tmp
 dec-stm32mp25-kit/**/.*.dtc.tmp
+
+# setup_dec_stm32.sh creates a per-machine EULA symlink at runtime
+# (pointing into meta-st-stm32mp's ST_EULA_SLA). It's a checkout-tree
+# artifact, not source — keep it out of the repo.
+conf/eula/

@@ -44,9 +44,29 @@ fi
 DISTRO="${DISTRO:-openstlinux-weston}"
 MACHINE="${MACHINE:-stm32mp25-dec-kit}"
 
+# ST's envsetup.sh defaults META_LAYER_ROOT=layers/meta-st, so it only
+# searches there for ${MACHINE}.conf and the matching conf/eula/${MACHINE}
+# file. Our machine conf lives in layers/meta-dec-stm32, so widen the
+# search to the whole layers/ tree.
+META_LAYER_ROOT="${META_LAYER_ROOT:-layers}"
+
+# envsetup.sh's eula_check derives the EULA path from the machine.conf
+# path via:  s|/machine/(.*)\.conf$|/eula/\1|  — so it expects a per-
+# machine EULA file alongside our machine conf at:
+#     layers/meta-dec-stm32/conf/eula/${MACHINE}
+# DEC reuses ST's standard SLA0048 verbatim (we depend on the same
+# proprietary firmware blobs + Vivante GPU userland), so symlink to
+# ST's canonical ST_EULA_SLA instead of carrying a duplicate copy.
+_DEC_EULA_DIR="${_SETUP_DEC_DIR}/layers/meta-dec-stm32/conf/eula"
+_ST_SLA_FILE="${_SETUP_DEC_DIR}/layers/meta-st/meta-st-stm32mp/conf/eula/ST_EULA_SLA"
+if [ -f "${_ST_SLA_FILE}" ]; then
+    mkdir -p "${_DEC_EULA_DIR}"
+    ln -sf "${_ST_SLA_FILE}" "${_DEC_EULA_DIR}/${MACHINE}"
+fi
+
 # Hand off to ST's envsetup.sh non-interactively. It still pauses at the
 # EULA on first run; that's intentional (the user has to read it once).
-DISTRO="${DISTRO}" MACHINE="${MACHINE}" \
+DISTRO="${DISTRO}" MACHINE="${MACHINE}" META_LAYER_ROOT="${META_LAYER_ROOT}" \
     source "${_ST_ENVSETUP}" --no-ui
 
 # After envsetup.sh runs we should be cd'd into the build dir, with
@@ -68,7 +88,7 @@ EOF
 fi
 
 # Cleanup
-unset _SETUP_DEC_DIR _ST_ENVSETUP _LOCAL_CONF _candidate
+unset _SETUP_DEC_DIR _ST_ENVSETUP _LOCAL_CONF _candidate _DEC_EULA_DIR _ST_SLA_FILE
 
 cat <<EOF
 

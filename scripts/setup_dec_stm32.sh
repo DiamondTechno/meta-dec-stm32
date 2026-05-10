@@ -21,15 +21,21 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
     exit 1
 fi
 
-# Where this script lives (handles being invoked from a symlink in the
-# repo root via the manifest linkfile).
+# Locate the ST envsetup.sh. The script is normally invoked via the
+# manifest linkfile symlink at the repo root, so the script's own dir
+# IS the repo root. Fall back to the in-tree location for direct runs.
 _SETUP_DEC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-_REPO_ROOT="$(cd "${_SETUP_DEC_DIR}/.." && pwd)"
-
-# Find the ST envsetup.sh in the synced layers.
-_ST_ENVSETUP="${_REPO_ROOT}/layers/meta-st/scripts/envsetup.sh"
-if [ ! -f "${_ST_ENVSETUP}" ]; then
-    echo "[ERROR] ST envsetup.sh not found at ${_ST_ENVSETUP}"
+_ST_ENVSETUP=""
+for _candidate in \
+    "${_SETUP_DEC_DIR}/layers/meta-st/scripts/envsetup.sh" \
+    "${_SETUP_DEC_DIR}/../../../layers/meta-st/scripts/envsetup.sh" ; do
+    if [ -f "${_candidate}" ]; then
+        _ST_ENVSETUP="$(cd "$(dirname "${_candidate}")" && pwd)/envsetup.sh"
+        break
+    fi
+done
+if [ -z "${_ST_ENVSETUP}" ]; then
+    echo "[ERROR] ST envsetup.sh not found near ${_SETUP_DEC_DIR}"
     echo "        Did you run 'repo sync' yet?"
     return 1
 fi
@@ -62,7 +68,7 @@ EOF
 fi
 
 # Cleanup
-unset _SETUP_DEC_DIR _REPO_ROOT _ST_ENVSETUP _LOCAL_CONF
+unset _SETUP_DEC_DIR _ST_ENVSETUP _LOCAL_CONF _candidate
 
 cat <<EOF
 

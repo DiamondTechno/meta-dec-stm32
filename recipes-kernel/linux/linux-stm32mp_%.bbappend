@@ -18,7 +18,6 @@ python() {
 KERNEL_CONFIG_FRAGMENTS:append:stm32mp2common = " ${WORKDIR}/fragments/features/${LINUX_VERSION}/dec_kernel_config_mods.config "
 
 SRC_URI += "file://${LINUX_VERSION}/dec_kernel_config_mods.config;subdir=fragments/features \
-            file://fragment.cfg \
             "
 
 SRC_URI:class-devupstream += " file://${LINUX_VERSION}/dec_kernel_config_mods.config;subdir=fragments/features "

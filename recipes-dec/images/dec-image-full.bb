@@ -75,6 +75,7 @@ IMAGE_INSTALL:append = " \
     dtc                                 \
     libp11 opensc openssl-bin           \
     net-tools                           \
+    udev-extraconf                      \
     \
     ${@bb.utils.contains('DISTRO_FEATURES', 'connman', \
         'connman-tools connman-tests connman-client', '', d)} \

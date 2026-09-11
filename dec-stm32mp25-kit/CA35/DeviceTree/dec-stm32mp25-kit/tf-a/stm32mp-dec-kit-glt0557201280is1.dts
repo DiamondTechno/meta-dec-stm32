@@ -52,17 +52,6 @@
 	chosen {
 		stdout-path = "serial0:115200n8";
 	};	
-
-	// usd_pwron_reg: usd_pwron {
-	// 	compatible = "regulator-fixed";
-	// 	pinctrl-names = "default";
-	// 	pinctrl-0 = <&usd_pwron_reg_pins>;		
-	// 	regulator-name = "usd-pwron-regulator";
-	// 	regulator-min-microvolt = <3300000>;
-	// 	regulator-max-microvolt = <3300000>;
-	// 	gpio = <&gpiod 2 GPIO_ACTIVE_HIGH>;
-	// 	enable-active-high;
-	// };
 	/* USER CODE END root */
 
 }; /*root*/
@@ -75,6 +64,25 @@
 			bias-disable;
 			drive-open-drain;
 			slew-rate = <0>;
+		};
+	};
+
+	sdmmc1_pins_mx: sdmmc1_mx-0 {
+		pins1 {
+			pinmux = <STM32_PINMUX('E', 0, AF10)>, /* SDMMC1_D2 */
+					 <STM32_PINMUX('E', 1, AF10)>, /* SDMMC1_D3 */
+					 <STM32_PINMUX('E', 2, AF10)>, /* SDMMC1_CMD */
+					 <STM32_PINMUX('E', 4, AF10)>, /* SDMMC1_D0 */
+					 <STM32_PINMUX('E', 5, AF10)>; /* SDMMC1_D1 */
+			bias-pull-up;
+			drive-push-pull;
+			slew-rate = <1>;
+		};
+		pins2 {
+			pinmux = <STM32_PINMUX('E', 3, AF10)>; /* SDMMC1_CK */
+			bias-pull-up;
+			drive-push-pull;
+			slew-rate = <2>;
 		};
 	};
 
@@ -240,6 +248,11 @@
 				regulator-min-microvolt = <2000000>;
 				regulator-max-microvolt = <2000000>;
 			};
+			vdd_sdcard: ldo7 {
+				regulator-name = "vdd_sdcard";
+				regulator-min-microvolt = <3300000>;
+				regulator-max-microvolt = <3300000>;
+			};
 			vddio_sdcard: ldo8 {
 				regulator-name = "vddio_sdcard";
 				st,regulator-bypass-microvolt = <3300000>;
@@ -310,6 +323,15 @@
 
 	/* USER CODE BEGIN saes */
 	/* USER CODE END saes */
+};
+
+&sdmmc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdmmc1_pins_mx>;
+	status = "okay";
+
+	/* USER CODE BEGIN sdmmc1 */
+	/* USER CODE END sdmmc1 */
 };
 
 &sdmmc2 {

@@ -18,8 +18,11 @@
 	/* USER CODE BEGIN root */
 	fwu-mdata {
 		compatible = "u-boot,fwu-mdata-gpt";
-		fwu-mdata-store = <&sdmmc1>;
+		fwu-mdata-store = <&sdmmc2>;
 	};	
+	config {
+		u-boot,mmc-env-partition = "u-boot-env";
+	};
 	/* USER CODE END root */
 
 	clocks{
@@ -64,14 +67,6 @@
 	bootph-all;
 };
 
-&usd_pwron_reg {
-	bootph-all;
-};
-
-&usd_pwron_reg_pins {
-	bootph-all;
-};
-
 &gpiod {
 	bootph-all;
 };
@@ -81,6 +76,10 @@
 };
 
 &scmi_vddio1 {
+	bootph-all;
+};
+
+&scmi_vdd_sdcard {
 	bootph-all;
 };
 /* USER CODE END addons */

@@ -43,6 +43,18 @@
 		serial2 = &usart1;
 		ethernet0 = &eth1;
 		ethernet1 = &eth2;
+		/*
+		 * Match the ST flashlayout convention where the
+		 * FlashLayout_sdcard_*.tsv writes to mmc0 and
+		 * FlashLayout_emmc_*.tsv writes to mmc1. Without this,
+		 * enumeration depends on probe order and the TSVs target
+		 * the wrong device.
+		 *   sdmmc1 = micro-SD on carrier (J24)  → mmc0 (TSV "sdcard")
+		 *   sdmmc2 = eMMC on SOM, non-removable → mmc1 (TSV "emmc")
+		 *   sdmmc3 = IW610 SDIO (wifi)          → mmc2
+		 */
+		mmc0 = &sdmmc1;
+		mmc1 = &sdmmc2;
 	};
 
 	chosen {
@@ -50,17 +62,6 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
-	};
-
-	usd_pwron_reg: usd_pwron {
-		compatible = "regulator-fixed";
-		pinctrl-names = "default";
-		pinctrl-0 = <&usd_pwron_reg_pins>;		
-		regulator-name = "usd-pwron-regulator";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&gpiod 2 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
 	};
 
 	reg_pcie_pwren: regulator-pcie-pwren {
@@ -672,12 +673,6 @@
 		};
 	};	
 
-	usd_pwron_reg_pins: usd_pwron_reg_pins-0  {								
-		pins {															
-			pinmux = <STM32_PINMUX('D', 2, GPIO)>; /* uSD_PWRON */		
-		};																
-	};
-		
 	pinctrl_lvds_touchscreen: pinctrl_lvds_touchscreen-0 {
 		pins {															
 			pinmux = <STM32_PINMUX('B', 6, GPIO)>; /* LVDSCT_nINT */		
@@ -1110,7 +1105,7 @@
 	disable-wp;
 	st,neg-edge;
 	bus-width = <4>;
-	vmmc-supply = <&usd_pwron_reg>;
+	vmmc-supply = <&scmi_vdd_sdcard>;
 	vqmmc-supply = <&scmi_vddio1>;	
 	sd-uhs-sdr12;
 	sd-uhs-sdr25;
@@ -1344,6 +1339,10 @@
 	scmi_vdd3v3_usb: regulator@20 {
 		reg = <VOLTD_SCMI_STPMIC2_LDO4>;
 		regulator-name = "vdd3v3_usb";
+	};
+	scmi_vdd_sdcard: regulator@22 {
+		reg = <VOLTD_SCMI_STPMIC2_LDO7>;
+		regulator-name = "vdd_sdcard";
 	};
 };
 

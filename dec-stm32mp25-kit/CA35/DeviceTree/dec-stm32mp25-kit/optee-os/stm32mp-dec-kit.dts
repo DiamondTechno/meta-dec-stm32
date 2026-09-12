@@ -552,7 +552,7 @@
 
 /* USER CODE BEGIN addons */
 / {
-	model = "Diamond Technologies STM32MP257F DEC Kit (optee-os)";
+	model = "Diamond Technologies STM32MP257F DEC Kit, rev02 SOM (optee-os)";
 };
 
 &cpu0 {

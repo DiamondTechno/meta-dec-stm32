@@ -362,7 +362,7 @@
 
 /* USER CODE BEGIN addons */
 / {
-	model = "Diamond Technologies STM32MP257F DEC Kit (trusted-firmware-a)";
+	model = "Diamond Technologies STM32MP257F DEC Kit, rev02 SOM (trusted-firmware-a)";
 };
 /* USER CODE END addons */
 

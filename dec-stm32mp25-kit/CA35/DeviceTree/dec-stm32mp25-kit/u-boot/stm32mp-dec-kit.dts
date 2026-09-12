@@ -1257,7 +1257,7 @@
 
 /* USER CODE BEGIN addons */
 / {
-	model = "Diamond Technologies STM32MP257F DEC Kit (u-boot)";
+	model = "Diamond Technologies STM32MP257F DEC Kit, rev02 SOM (u-boot)";
 
 	panel_lvds_backlight: panel-lvds-backlight {
 		compatible = "pwm-backlight";

@@ -37,5 +37,5 @@ machinery has been forked here and renamed.
 ## Distro
 
 This layer is designed to be used with upstream `openstlinux-weston`
-(no distro fork). systemd + NetworkManager are turned on via the
+(no distro fork). systemd + connman are turned on via the
 machine config's `DISTRO_FEATURES:append`, not via a forked distro.
